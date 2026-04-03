@@ -22,7 +22,7 @@ Talent IQ supports two main use cases:
 - Monaco code editor with support for JavaScript, Python, and Java.
 - Resizable coding layout for problem description, editor, output, and video/chat.
 - Practice problems page with curated coding questions and difficulty labels.
-- Remote code execution through the Piston API.
+- Remote code execution through a Piston-compatible API.
 - Test-style output validation in practice mode with success and failure toasts.
 - Confetti celebration when all expected outputs match in practice mode.
 - Recent completed sessions and active session browsing from the dashboard.
@@ -90,7 +90,7 @@ From the Dashboard, a user can:
 - Clerk for authentication
 - Stream for video and chat
 - MongoDB for persistence
-- Piston API for code execution
+- Piston-compatible API for code execution
 - Inngest for async event-driven user sync
 
 ## Repository structure
@@ -129,6 +129,7 @@ NODE_ENV=development
 
 DB_URL=your_mongodb_connection_string
 CLIENT_URL=http://localhost:5173
+PISTON_API_URL=http://localhost:2000/api/v2/piston
 
 CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
@@ -228,7 +229,8 @@ Inngest handler:
 
 - Session participation is limited to two users: one host and one participant.
 - Practice mode currently includes curated in-app problems and expected outputs for JavaScript, Python, and Java.
-- Code execution depends on the external Piston API being reachable.
+- Code execution depends on a reachable Piston-compatible API.
+- The public `emkc.org` Piston endpoint is allowlist-only, so local development should use your own Piston instance via `PISTON_API_URL`.
 - Video and chat depend on valid Stream credentials.
 - Authentication-protected routes depend on valid Clerk configuration.
 

@@ -1,8 +1,11 @@
-const PISTON_API = "https://emkc.org/api/v2/piston";
+import { ENV } from "../lib/env.js";
+
+const DEFAULT_PISTON_API = "https://emkc.org/api/v2/piston";
+const PISTON_API = ENV.PISTON_API_URL || DEFAULT_PISTON_API;
 
 const LANGUAGE_VERSIONS = {
   javascript: { language: "javascript", version: "18.15.0" },
-  python: { language: "python", version: "3.10.0" },
+  python: { language: "python", version: "3.12.0" },
   java: { language: "java", version: "15.0.2" },
 };
 
@@ -14,6 +17,23 @@ function getFileExtension(language) {
   };
 
   return extensions[language] || "txt";
+}
+
+function getProviderErrorMessage(status, responseText) {
+  const normalizedText = responseText.toLowerCase();
+
+  if (normalizedText.includes("whitelist")) {
+    return {
+      error: "Code execution is currently unavailable.",
+      details:
+        "The public Piston API now requires allowlist access. Configure PISTON_API_URL to point to your own Piston server or another compatible execution service.",
+    };
+  }
+
+  return {
+    error: `Execution provider error: ${status}`,
+    details: responseText || "The code execution provider returned an unexpected error.",
+  };
 }
 
 export async function executeCode(req, res) {
@@ -47,11 +67,11 @@ export async function executeCode(req, res) {
 
     if (!response.ok) {
       const responseText = await response.text();
+      const providerError = getProviderErrorMessage(response.status, responseText);
 
       return res.status(response.status).json({
         success: false,
-        error: `Execution provider error: ${response.status}`,
-        details: responseText,
+        ...providerError,
       });
     }
 
